@@ -1,2 +1,2 @@
-# -Modern-computer-networks-mipt-2025
+# Modern-computer-networks-mipt-2025
 Домашние задания по курсу "Современные компьютерные сети" 2025 года МФТИ
