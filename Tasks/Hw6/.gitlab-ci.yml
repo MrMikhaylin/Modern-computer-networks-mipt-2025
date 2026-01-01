@@ -1,0 +1,41 @@
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  image: helicopter.intra.ispras.ru:5050/net/http-ca/buildah
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_VERIFY: 1
+    DOCKER_CERT_PATH: "$DOCKER_TLS_CERTDIR/client"
+  before_script:
+    - ln -s /usr/bin/buildah /usr/bin/docker
+    - docker info
+    - echo "$REGISTRY_PASSWORD" | docker login -u $REGISTRY_USER --password-stdin $REGISTRY
+  script: 
+    - cd ./acme
+    - docker build -t helicopter.intra.ispras.ru:5050/net/http-ca/acme:$GITLAB_USER_ID .
+    - docker push helicopter.intra.ispras.ru:5050/net/http-ca/acme:$GITLAB_USER_ID
+
+
+test:
+  stage: test
+  image: helicopter.intra.ispras.ru:5050/net/http-ca/alpine
+  services:
+    - name: helicopter.intra.ispras.ru:5050/net/http-ca/acme:$GITLAB_USER_ID
+      alias: acme
+  variables:
+    ACME_URL: http://acme:80
+  before_script:
+    - apk add py3-pip py3-cryptography
+    - pip3 install pytest requests --break-system-packages
+  script:
+    - pytest -sv --junit-xml=./report.xml
+  artifacts:
+    when: always
+    paths:
+      - $CI_PROJECT_DIR/report.xml
+    reports:
+      junit: $CI_PROJECT_DIR/report.xml
+
