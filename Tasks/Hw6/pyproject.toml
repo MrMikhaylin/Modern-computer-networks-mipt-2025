@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acme-tester"
+version = "0.1.0"
+description = "Test facility for acme server"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+dependencies = ["pytest>=7.0.0", "pytest-timeout", "requests"]
+requires-python = ">=3.8"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "."
+]
+pythonpath = ["."]
+
