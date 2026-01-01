@@ -1,0 +1,39 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  server:
+    image: rerand0m/cn-alpine
+    container_name: rendezvous-server
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    command: python3 /app/server.py --port 5000
+    networks:
+      - shared-net
+
+  client1:
+    image: rerand0m/cn-alpine
+    container_name: client1
+    volumes:
+      - .:/app
+    command: python3 /app/client.py --name CLIENT1 --port 51001 --server-host rendezvous-server --server-port 5000 --scenario local
+    networks:
+      - shared-net
+
+  client2:
+    image: rerand0m/cn-alpine
+    container_name: client2
+    volumes:
+      - .:/app
+    command: python3 /app/client.py --name CLIENT2 --port 51002 --server-host rendezvous-server --server-port 5000 --scenario local
+    networks:
+      - shared-net
+
+networks:
+  shared-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.0.0/24
